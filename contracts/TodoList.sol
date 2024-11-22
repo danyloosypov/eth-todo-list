@@ -22,6 +22,10 @@ contract TodoList {
         bool completed
     );
 
+    event TaskDeleted(
+        uint id
+    );
+
     constructor() public {
         createTask("test");
     }
@@ -37,6 +41,12 @@ contract TodoList {
         _task.completed = !_task.completed;
         tasks[_id] = _task;
         emit TaskCompleted(_id, _task.completed);
+    }
+
+    function deleteTask(uint _id) public {
+        delete tasks[_id]; 
+
+        emit TaskDeleted(_id);
     }
 
 }

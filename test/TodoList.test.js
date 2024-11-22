@@ -40,4 +40,29 @@ contract('TodoList', (accounts) => {
     assert.equal(event.id.toNumber(), 1)
     assert.equal(event.completed, true)
   })
+
+  it('toggles task delete', async () => {
+    const taskCountBefore = await this.todoList.taskCount()
+    
+    for (let i = 1; i <= taskCountBefore; i++) {
+      const task = await this.todoList.tasks(i)
+      console.log(`Task ${i} content: ${task.content}`)
+    }
+
+    const result = await this.todoList.deleteTask(1)
+    const task = await this.todoList.tasks(1)
+
+    const taskCountAfter = await this.todoList.taskCount()
+
+    for (let i = 1; i <= taskCountAfter; i++) {
+      const task = await this.todoList.tasks(i)
+      console.log(`Task ${i} content: ${task.content}`)
+    }
+
+    assert.equal(task.content, '', 'Task content should be empty after deletion')
+    assert.equal(task.completed, false, 'Task should not be completed after deletion')
+
+    const taskCount = await this.todoList.taskCount()
+    assert.equal(taskCount, 2, 'Task count should remain the same after deletion (it does not decrease)')
+  })
 })

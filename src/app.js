@@ -84,6 +84,10 @@ App = {
             const taskId = task[0].toNumber()
             const taskContent = task[1]
             const taskCompleted = task[2]
+
+            if (!taskContent || taskContent.trim() === "") {
+                continue; // Skip this task if content is empty
+            }
         
             // Create the html for the task
             const $newTaskTemplate = $taskTemplate.clone()
@@ -92,6 +96,11 @@ App = {
                             .prop('name', taskId)
                             .prop('checked', taskCompleted)
                             .on('click', App.toggleCompleted)
+                            
+
+            $newTaskTemplate.find('.delete')
+                            .attr('data-id', taskId)
+                            .on('click', App.toggleDelete);
         
             // Put the task in the correct list
             if (taskCompleted) {
@@ -116,6 +125,13 @@ App = {
         App.setLoading(true)
         const taskId = e.target.name
         await App.todoList.toggleCompleted(taskId, { from: App.account })
+        window.location.reload()
+    },
+
+    toggleDelete: async (e) => {
+        App.setLoading(true)
+        const taskId = e.target.dataset.id
+        await App.todoList.deleteTask(taskId, { from: App.account })
         window.location.reload()
     },
 
