@@ -1,6 +1,7 @@
 App = {
     loading: false,
     contracts: {},
+    editTaskId: null,
 
     load: async () => {
         await App.loadWeb3();
@@ -91,6 +92,8 @@ App = {
         
             // Create the html for the task
             const $newTaskTemplate = $taskTemplate.clone()
+            $newTaskTemplate.addClass('task');
+            
             $newTaskTemplate.find('.content').html(taskContent)
             $newTaskTemplate.find('input')
                             .prop('name', taskId)
@@ -101,6 +104,15 @@ App = {
             $newTaskTemplate.find('.delete')
                             .attr('data-id', taskId)
                             .on('click', App.toggleDelete);
+
+
+            $newTaskTemplate.find('.edit')
+                            .attr('data-id', taskId)
+                            .on('click', function() {
+                                const taskId = $(this).attr('data-id'); // Get the task ID from the button's data-id attribute
+                                const taskContent = $(this).closest('.task').find('.content').text(); // Get the task content
+                                App.showEditForm(taskId, taskContent); // Show the edit form
+                            });
         
             // Put the task in the correct list
             if (taskCompleted) {
@@ -135,6 +147,24 @@ App = {
         window.location.reload()
     },
 
+    showEditForm: function(taskId, content) {
+        this.editTaskId = taskId; // Set the task ID we're editing
+        document.getElementById('editTaskContent').value = content; // Set the current content in the input field
+        document.getElementById('editForm').style.display = 'block'; // Show the edit form
+    },
+
+    saveEdit: async (e) => {
+        App.setLoading(true)
+        const newContent = document.getElementById('editTaskContent').value;
+        await App.todoList.editTask(App.editTaskId, newContent, { from: App.account })
+        window.location.reload()
+    },
+
+    cancelEdit: function() {
+        App.editTaskId = null;
+        document.getElementById('editForm').style.display = 'none'; // Hide the edit form without saving
+    },
+
     setLoading: (boolean) => {
         App.loading = boolean
         const loader = $('#loader')
@@ -149,8 +179,18 @@ App = {
     }
 };
 
+
 $(() => {
     $(window).load(() => {
         App.load();
+
+        document.getElementById('saveEdit').onclick = function() {
+            App.saveEdit();
+        };
+          
+        document.getElementById('cancelEdit').onclick = function() {
+            App.cancelEdit();
+        };
+        
     });
 });

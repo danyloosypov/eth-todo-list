@@ -65,4 +65,13 @@ contract('TodoList', (accounts) => {
     const taskCount = await this.todoList.taskCount()
     assert.equal(taskCount, 2, 'Task count should remain the same after deletion (it does not decrease)')
   })
+
+  it('edits task', async () => {
+    const result = await this.todoList.editTask(1, 'chinazes')
+    const task = await this.todoList.tasks(1)
+    assert.equal(task.content, 'chinazes')
+    const event = result.logs[0].args
+    assert.equal(event.id.toNumber(), 1, 'The task ID should be 1')
+    assert.equal(event.content, 'chinazes', 'The task content should be updated to "chinazes"')
+  })
 })

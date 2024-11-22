@@ -26,6 +26,11 @@ contract TodoList {
         uint id
     );
 
+    event TaskEdited(
+        uint id,
+        string content
+    );
+
     constructor() public {
         createTask("test");
     }
@@ -37,7 +42,7 @@ contract TodoList {
     }
 
     function toggleCompleted(uint _id) public {
-        Task memory _task = tasks[_id];
+        Task storage _task = tasks[_id];
         _task.completed = !_task.completed;
         tasks[_id] = _task;
         emit TaskCompleted(_id, _task.completed);
@@ -47,6 +52,13 @@ contract TodoList {
         delete tasks[_id]; 
 
         emit TaskDeleted(_id);
+    }
+
+    function editTask(uint _id, string memory _content) public {
+        Task storage _task = tasks[_id];
+        _task.content = _content;
+        tasks[_id] = _task;
+        emit TaskEdited(_id, _task.content);
     }
 
 }
